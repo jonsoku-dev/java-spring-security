@@ -32,7 +32,7 @@ public class IndexController {
         return "manager";
     }
 
-    @GetMapping("/login")
+    @GetMapping("/login") // SecurityConfig 를 만들고 나서부터 작동하지 않음.
     public @ResponseBody
     String login() {
         return "login";
