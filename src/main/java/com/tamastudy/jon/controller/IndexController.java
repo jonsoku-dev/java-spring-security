@@ -1,11 +1,25 @@
 package com.tamastudy.jon.controller;
 
+import com.tamastudy.jon.entity.User;
+import com.tamastudy.jon.repository.UserRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 @Controller // View 를 Return 하겠다 !
 public class IndexController {
+
+    private final UserRepository userRepository;
+    private final BCryptPasswordEncoder bCryptPasswordEncoder;
+
+    public IndexController(UserRepository userRepository, BCryptPasswordEncoder bCryptPasswordEncoder) {
+        this.userRepository = userRepository;
+        this.bCryptPasswordEncoder = bCryptPasswordEncoder;
+    }
+
     @GetMapping({"", "/"})
     public @ResponseBody
     String index() {
@@ -32,21 +46,25 @@ public class IndexController {
         return "manager";
     }
 
-    @GetMapping("/login") // SecurityConfig 를 만들고 나서부터 작동하지 않음.
-    public @ResponseBody
-    String login() {
-        return "login";
+    @GetMapping("/loginForm") // SecurityConfig 를 만들고 나서부터 작동하지 않음.
+    public String loginForm() {
+        return "loginForm";
     }
 
-    @GetMapping("/join")
-    public @ResponseBody
-    String join() {
-        return "join";
+    @GetMapping("/joinForm")
+    public String joinForm() {
+        return "joinForm";
     }
 
-    @GetMapping("/joinProc")
-    public @ResponseBody
-    String joinProc() {
-        return "회원가입완료됨!";
+    @PostMapping("/join")
+    public String join(User user) {
+        System.out.println("user = " + user);
+        // 회원가입
+        user.setRole("ROLE_USER");
+        String rawPassword = user.getPassword();
+        String encPassword = bCryptPasswordEncoder.encode(rawPassword);
+        user.setPassword(encPassword);
+        userRepository.save(user);
+        return "redirect:/loginForm";
     }
 }
