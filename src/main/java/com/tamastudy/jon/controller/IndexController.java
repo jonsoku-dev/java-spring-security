@@ -2,7 +2,8 @@ package com.tamastudy.jon.controller;
 
 import com.tamastudy.jon.entity.User;
 import com.tamastudy.jon.repository.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.annotation.Secured;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -66,5 +67,19 @@ public class IndexController {
         user.setPassword(encPassword);
         userRepository.save(user);
         return "redirect:/loginForm";
+    }
+
+    @Secured("ROLE_ADMIN") // SecureConfig 에 일일히 등록하지 않아도 되어서 편하다.
+    @GetMapping("/info")
+    public @ResponseBody
+    String info() {
+        return "개인정보";
+    }
+
+    @PreAuthorize("hasRole('ROLE_MANAGER')") // 여러개의 role 을 정하고싶을 때
+    @GetMapping("/data")
+    public @ResponseBody
+    String data() {
+        return "데이터정보";
     }
 }
