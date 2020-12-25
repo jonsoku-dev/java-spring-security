@@ -1,6 +1,9 @@
 package com.tamastudy.jon.config.oauth;
 
 import com.tamastudy.jon.config.auth.PrincipalDetails;
+import com.tamastudy.jon.config.oauth.provider.FacebookUserInfo;
+import com.tamastudy.jon.config.oauth.provider.GoogleUserInfo;
+import com.tamastudy.jon.config.oauth.provider.OAuth2UserInfo;
 import com.tamastudy.jon.entity.User;
 import com.tamastudy.jon.repository.UserRepository;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -33,11 +36,24 @@ public class PrincipalOauth2UserService extends DefaultOAuth2UserService {
         // userRequest 정보 -> loadUser 함수 (회원프로필 받아야함) -> 구글로부터 회원프로필을 받아준다.
         System.out.println("super.loadUser(userRequest)= " + oAuth2User.getAttributes());
 
-        String provider = userRequest.getClientRegistration().getClientId(); // provider = google
-        String providerId = oAuth2User.getAttribute("sub");
+        OAuth2UserInfo oAuth2UserInfo = null;
+        if (userRequest.getClientRegistration().getRegistrationId().equals("google")) {
+            oAuth2UserInfo = new GoogleUserInfo(oAuth2User.getAttributes());
+        } else if (userRequest.getClientRegistration().getRegistrationId().equals("facebook")) {
+            oAuth2UserInfo = new FacebookUserInfo(oAuth2User.getAttributes());
+        } else {
+            System.out.println("우리는 구글과 페이스북만 지원해요 !");
+        }
+
+//        String provider = userRequest.getClientRegistration().getRegistrationId(); // provider = google
+        assert oAuth2UserInfo != null;
+        String provider = oAuth2UserInfo.getProvider();
+//        String providerId = oAuth2User.getAttribute("sub");
+        String providerId = oAuth2UserInfo.getProviderId();
         String username = provider + "_" + providerId; // ex) google_12321321302138123
         String password = bCryptPasswordEncoder.encode("tamastudy");
-        String email = oAuth2User.getAttribute("email");
+//        String email = oAuth2User.getAttribute("email");
+        String email = oAuth2UserInfo.getEmail();
         String role = "ROLE_USER";
 
         User userEntity = userRepository.findByUsername(username);
@@ -52,6 +68,8 @@ public class PrincipalOauth2UserService extends DefaultOAuth2UserService {
                     .providerId(providerId)
                     .build();
             userRepository.save(userEntity);
+        } else {
+            System.out.println("로그인을 이미 한적이 있습니다. 당신은 자동회원가입이 되어 있습니다.");
         }
         // Authentication 객체 안에 들어갈 것이다.
         return new PrincipalDetails(userEntity, oAuth2User.getAttributes());
