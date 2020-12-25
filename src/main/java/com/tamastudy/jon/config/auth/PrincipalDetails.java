@@ -24,7 +24,7 @@ import java.util.Map;
  * Authentication 에는 UserDetails 객체와 OAuth2User 객체만 들어 올 수 있다.
  * 컨트롤러에서 사용할 때 타입을 2개 다 적어주기엔 공수가 많이 들기 때문에,
  * 하나의 부모객체를 두고, 이 안에 UserDetails, OAuth2User 객체를 두면, 부모객체만 사용하면 된다.
- *
+ * <p>
  * 물론 둘다 overriding 해야한다. 기능구현은 아래 코드를 참고
  */
 
@@ -32,10 +32,17 @@ import java.util.Map;
 public class PrincipalDetails implements UserDetails, OAuth2User {
 
     private final User user; // composition
+    private Map<String, Object> attributes;
 
+    // 일반 로그인 시 사용하는 생성자
     public PrincipalDetails(User user) {
-        super();
         this.user = user;
+    }
+
+    // OAuth 로그인 시 사용하는 생성자
+    public PrincipalDetails(User user, Map<String, Object> attributes) {
+        this.user = user;
+        this.attributes = attributes;
     }
 
     // 해당 User 의 권한을 리턴하는 곳 !!
@@ -83,12 +90,12 @@ public class PrincipalDetails implements UserDetails, OAuth2User {
     }
 
     @Override
-    public <A> A getAttribute(String name) {
-        return null;
+    public Map<String, Object> getAttributes() {
+        return attributes;
     }
 
     @Override
-    public Map<String, Object> getAttributes() {
+    public String getName() {
         return null;
     }
 }

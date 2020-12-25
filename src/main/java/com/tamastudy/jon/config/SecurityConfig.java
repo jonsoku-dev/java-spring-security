@@ -15,11 +15,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 @EnableGlobalMethodSecurity(securedEnabled = true, prePostEnabled = true) // secured 어노테이션 활성화, preAuthorize 어노테이션 활성화
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
-    private final PrincipalOauth2UserService oauth2UserService;
-
-    public SecurityConfig(PrincipalOauth2UserService oauth2UserService) {
-        this.oauth2UserService = oauth2UserService;
-    }
+    @Autowired
+    private PrincipalOauth2UserService oauth2UserService;
 
     // 해당 메서드의 리턴되는 오브젝트를 IoC로 등록해준다.
     @Bean

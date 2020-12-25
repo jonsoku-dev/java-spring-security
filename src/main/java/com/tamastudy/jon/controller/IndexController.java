@@ -24,11 +24,11 @@ public class IndexController {
     @GetMapping("/test/login")
     public @ResponseBody
     String loginTest(
-                    // 1. 첫번째 방법
-                    Authentication authentication,
-                     // 2. 세션 정보에 접근할 수 있다.
+            // 1. 첫번째 방법
+            Authentication authentication,
+            // 2. 세션 정보에 접근할 수 있다.
 //                     @AuthenticationPrincipal UserDetails userDetails
-                     @AuthenticationPrincipal PrincipalDetails userDetails
+            @AuthenticationPrincipal PrincipalDetails userDetails
     ) { // DI (의존성주입)
         /**
          *  1 번째 유저 정보 찾는 방법 - Authentication authentication 으로
@@ -74,9 +74,15 @@ public class IndexController {
         return "index";
     }
 
+    /**
+     * OAuth 로 로그인을 해도 PrincipalDetails
+     * 일반 로그인을 해도 PrincipalDetails
+     * 다운 캐스팅 하지 않아도 되서 편하다.
+     */
     @GetMapping("/user")
     public @ResponseBody
-    String user() {
+    String user(@AuthenticationPrincipal PrincipalDetails principalDetails) {
+        System.out.println("principalDetails.getUser() = " + principalDetails.getUser());
         return "user";
     }
 
