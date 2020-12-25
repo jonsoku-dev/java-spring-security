@@ -17,4 +17,7 @@ public class User extends JpaBaseEntity {
     private String password;
     private String email;
     private String role;
+
+    private String provider; // google, etc...
+    private String providerId; // sub id
 }
